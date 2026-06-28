@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="AboutAutoFixture.md" />
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="Hallett.AutoFixture.Moq/Hallett.AutoFixture.Moq.csproj" Id="3afe3b2f-95b7-41fd-8dab-66a287dc91a2" />
+  <Project Path="Hallett.AutoFixture.NUnit4.Moq/Hallett.AutoFixture.NUnit4.Moq.csproj" Id="ea1d5a53-1aee-4a54-9996-7f491358c998" />
+  <Project Path="Hallett.AutoFixture.NUnit4/Hallett.AutoFixture.NUnit4.csproj" Id="725ab865-715f-49b3-80b2-6617e307b9f1" />
+  <Project Path="Hallett.AutoFixture.Tests/Hallett.AutoFixture.Tests.csproj" />
+  <Project Path="Hallett.AutoFixture/Hallett.AutoFixture.csproj" />
+</Solution>
