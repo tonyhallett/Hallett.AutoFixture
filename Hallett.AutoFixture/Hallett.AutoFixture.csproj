@@ -12,6 +12,7 @@
     <PackageTags>AutoFixture</PackageTags>
     <Authors>TonyHUk</Authors>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>

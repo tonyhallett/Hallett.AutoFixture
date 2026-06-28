@@ -12,6 +12,7 @@
     <RepositoryUrl>https://github.com/tonyhallett/Hallett.AutoFixture.git</RepositoryUrl>
     <PackageTags>AutoFixture;Moq</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
 	<ItemGroup>

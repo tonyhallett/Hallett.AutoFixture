@@ -14,6 +14,7 @@ Also includes improved frozen attributes.</Description>
     <RepositoryUrl>https://github.com/tonyhallett/Hallett.AutoFixture.git</RepositoryUrl>
     <PackageTags>AutoFixture;NUnit;Parameterized;CancelAfter;CancelAfterAttribute;TestCaseSource;TestCaseSourceAttribute;CombiningStrategy;CombiningStrategyAttribute;Theory;TheoryAttribute;CombinatorialAttribute;PairwiseAttribute;SequentialAttribute;IFixtureFactory;Frozen</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
 	<ItemGroup>
