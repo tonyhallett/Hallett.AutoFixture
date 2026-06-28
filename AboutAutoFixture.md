@@ -1468,8 +1468,6 @@ It then uses the NUnit helper `NUnitTestCaseBuilder`
 
 </details>
 
-## CancelAfter aware AutoDataAttribute and InlineAutoDataAttribute
-
 <details>
 <summary>CancelAfter aware AutoDataAttribute and InlineAutoDataAttribute</summary>
 
@@ -1653,7 +1651,7 @@ internal static class CancelAfterAttributeExtensions
 ## AutoFixture NUnit Parameterized Tests
 
 <details>
-    <summary>CombiningStrategyAttribute</summary>
+    <summary>AutoCombiningStrategyAttribute and derivations</summary>
 
 The NUnit CombiningStrategyAttribute is an abstract base attribute.
 
