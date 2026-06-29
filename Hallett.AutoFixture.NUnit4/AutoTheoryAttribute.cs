@@ -15,7 +15,11 @@ namespace Hallett.AutoFixture.NUnit4
 
         protected AutoTheoryAttribute(Func<IFixture> fixtureFactory, bool searchInDeclaringTypes = false)
             : base(new CombinatorialStrategy(),
-                  new ParameterDataProvider(new DatapointProvider(searchInDeclaringTypes), new ParameterDataSourceProvider()), fixtureFactory)
+                   new AutoParameterDataProvider(
+                       new ParameterDataProvider(
+                           new DatapointProvider(searchInDeclaringTypes),
+                           new ParameterDataSourceProvider()), false),
+                   fixtureFactory)
         {
         }
     }

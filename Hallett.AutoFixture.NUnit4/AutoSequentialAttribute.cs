@@ -14,7 +14,9 @@ namespace Hallett.AutoFixture.NUnit4
         }
 
         protected AutoSequentialAttribute(Func<IFixture> fixtureFactory)
-            : base(new SequentialStrategy(), new ParameterDataSourceProvider(), fixtureFactory)
+            : base(new SequentialStrategy(),
+                  new AutoParameterDataProvider(new ParameterDataSourceProvider()),
+                  fixtureFactory)
         {
         }
     }

@@ -9,7 +9,7 @@ namespace Hallett.AutoFixture.NUnit4
         where TFixtureFactory : IFixtureFactory, new()
     {
         public AutoSequentialAttribute()
-            : base(new SequentialStrategy(), new ParameterDataSourceProvider())
+            : base(new SequentialStrategy(), new AutoParameterDataProvider(new ParameterDataSourceProvider()))
         {
         }
     }

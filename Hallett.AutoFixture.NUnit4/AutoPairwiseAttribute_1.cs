@@ -9,7 +9,7 @@ namespace Hallett.AutoFixture.NUnit4
         where TFixtureFactory : IFixtureFactory, new()
     {
         public AutoPairwiseAttribute()
-            : base(new PairwiseStrategy(), new ParameterDataSourceProvider())
+            : base(new PairwiseStrategy(), new AutoParameterDataProvider(new ParameterDataSourceProvider()))
         {
         }
     }

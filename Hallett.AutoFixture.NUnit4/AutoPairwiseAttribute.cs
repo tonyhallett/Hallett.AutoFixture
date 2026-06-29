@@ -14,7 +14,9 @@ namespace Hallett.AutoFixture.NUnit4
         }
 
         protected AutoPairwiseAttribute(Func<IFixture> fixtureFactory)
-            : base(new PairwiseStrategy(), new ParameterDataSourceProvider(), fixtureFactory)
+            : base(new PairwiseStrategy(),
+                  new AutoParameterDataProvider(new ParameterDataSourceProvider()),
+                  fixtureFactory)
         {
         }
     }

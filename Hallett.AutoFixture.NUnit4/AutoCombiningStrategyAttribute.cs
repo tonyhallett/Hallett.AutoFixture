@@ -10,7 +10,7 @@ namespace Hallett.AutoFixture.NUnit4
     /// AutoFixture enabled version of NUnit's CombiningStrategyAttribute.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
-    public abstract class AutoCombiningStrategyAttribute(ICombiningStrategy strategy, IParameterDataProvider provider, Func<IFixture>? fixtureFactory = null)
+    public abstract class AutoCombiningStrategyAttribute(ICombiningStrategy strategy, IAutoParameterDataProvider provider, Func<IFixture>? fixtureFactory = null)
         : Attribute, ITestBuilder, IApplyToTest
     {
         internal IAutoCombiningStrategyHelper AutoCombiningStrategyHelper { get; set; } = new AutoCombiningStrategyHelper();

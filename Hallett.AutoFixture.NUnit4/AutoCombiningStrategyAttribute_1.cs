@@ -9,11 +9,13 @@ namespace Hallett.AutoFixture.NUnit4
     /// AutoFixture enabled version of NUnit's CombiningStrategyAttribute, with fixture factory support.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
-    public abstract class AutoCombiningStrategyAttribute<TFixtureFactory>(ICombiningStrategy strategy, IParameterDataProvider provider)
+    public abstract class AutoCombiningStrategyAttribute<TFixtureFactory>(ICombiningStrategy strategy, IAutoParameterDataProvider provider)
         : Attribute, ITestBuilder, IApplyToTest where TFixtureFactory : IFixtureFactory, new()
     {
         internal IAutoCombiningStrategyHelper AutoCombiningStrategyHelper { get; set; } = new AutoCombiningStrategyHelper();
+
         internal ITestCaseTestMethodCreator TestCaseTestMethodCreator { get; set; } = new TestCaseTestMethodCreator();
+
         public IEnumerable<TestMethod> BuildFrom(IMethodInfo method, Test? suite)
             => AutoCombiningStrategyHelper.BuildFrom(
                     method,

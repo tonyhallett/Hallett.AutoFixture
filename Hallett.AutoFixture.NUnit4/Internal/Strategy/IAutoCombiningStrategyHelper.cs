@@ -9,7 +9,7 @@ namespace Hallett.AutoFixture.NUnit4.Internal.Strategy
             IMethodInfo method,
             Test? suite,
             ICombiningStrategy strategy,
-            IParameterDataProvider provider,
+            IAutoParameterDataProvider provider,
             Func<ITestCaseData, TestMethod> testMethodFromTestCaseData);
 
         void ApplyStrategyTypeNameToTest(Test test, ICombiningStrategy strategy);

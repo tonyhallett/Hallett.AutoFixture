@@ -1,4 +1,5 @@
-﻿using AutoFixture.NUnit4;
+﻿using AutoFixture;
+using AutoFixture.NUnit4;
 using Hallett.AutoFixture.NUnit4;
 using Hallett.AutoFixture.Tests.TestHelpers;
 using NUnit.Framework.Interfaces;
@@ -30,7 +31,7 @@ namespace Hallett.AutoFixture.Tests.NUnit
     {
         public class TestAutoCombiningStrategyAttribute : AutoCombiningStrategyAttribute
         {
-            public TestAutoCombiningStrategyAttribute(ICombiningStrategy strategy, IParameterDataProvider provider, Type type)
+            public TestAutoCombiningStrategyAttribute(ICombiningStrategy strategy, IAutoParameterDataProvider provider, Type type)
                 : base(strategy, provider)
             {
                 this.InlineAutoDataAttributeType = type;
@@ -55,14 +56,14 @@ namespace Hallett.AutoFixture.Tests.NUnit
         }
 
         [Test, AutoCombinatorial(InlineAutoDataAttributeType = typeof(MoqTestCaseAttribute))]
-        public void AutoCombinatorial([Values(1, 2)] int value, [Auto][Frozen] ITestInterface testInterface, SUT sut)
+        public void AutoCombinatorial([Values(1, 2)] int value, [Frozen] ITestInterface testInterface, SUT sut)
         {
             sut.DoSomething(value);
             Assert.That(testInterface.Value, Is.EqualTo(value));
         }
 
         [Test, CancelAfter(1000), AutoCombinatorial(InlineAutoDataAttributeType = typeof(MoqTestCaseAttribute))]
-        public void NUnitCancellationTokenTest([Values(2, 4)] int value, [Auto][Frozen] ITestInterface testInterface, SUT sut, CancellationToken nUnitCancellationToken)
+        public void NUnitCancellationTokenTest([Values(2, 4)] int value, [Frozen] ITestInterface testInterface, SUT sut, CancellationToken nUnitCancellationToken)
         {
             Assert.Multiple(() =>
             {
@@ -74,7 +75,7 @@ namespace Hallett.AutoFixture.Tests.NUnit
         }
 
         [Test, AutoCombinatorial()]
-        public void AutoCombiningStrategyAttribute_Can_Freeze([Frozen][Values(1, 2)] int value, [Values("One")] string str, [Auto] int fromAutoFixture, string fromAutoFixtureStr)
+        public void AutoCombiningStrategyAttribute_Can_Freeze([Frozen][Values(1, 2)] int value, [Values("One")] string str, int fromAutoFixture, string fromAutoFixtureStr)
         {
             Assert.Multiple(() =>
             {
@@ -84,7 +85,7 @@ namespace Hallett.AutoFixture.Tests.NUnit
         }
 
         [Test, AutoCombinatorial<MoqFixtureFactory>()]
-        public void AutoCombiningStrategyAttributeT_Can_Freeze([Frozen][Values(1, 2)] int value, [Values("One")] string str, [Auto] int fromAutoFixture, string fromAutoFixtureStr)
+        public void AutoCombiningStrategyAttributeT_Can_Freeze([Frozen][Values(1, 2)] int value, [Values("One")] string str, int fromAutoFixture, string fromAutoFixtureStr)
         {
             Assert.Multiple(() =>
             {
@@ -109,6 +110,26 @@ namespace Hallett.AutoFixture.Tests.NUnit
         {
             sut.DoSomething(datapoint);
             Assert.That(testInterface.Value, Is.EqualTo(datapoint));
+        }
+
+        class FixedIntFactory : IFixtureFactory
+        {
+            public IFixture Create()
+            {
+                var fixture = new Fixture();
+                fixture.Inject(42);
+                return fixture;
+            }
+        }
+
+        [Test, AutoTheory<FixedIntFactory>(true)]
+        public void AutoTheory_AutoAttribute(int datapoint, [Auto][Frozen] int fixtureInt)
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.That(datapoint, Is.Not.EqualTo(42));
+                Assert.That(fixtureInt, Is.EqualTo(42));
+            });
         }
     }
 }

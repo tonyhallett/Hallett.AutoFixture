@@ -72,43 +72,49 @@ public TheoryAttribute(bool searchInDeclaringTypes = false) : base(
 
 There are "Auto" versions of CombiningStrategyAttribute and derivations.
 
+If you have your own `IParameterDataProvider` derivation note that the AutoCombiningStrategyAttribute accepts `IAutoParameterDataProvider`.
+
+```C#
+    public abstract class AutoCombiningStrategyAttribute(
+        ICombiningStrategy strategy, 
+        IAutoParameterDataProvider provider, 
+        Func<IFixture>? fixtureFactory = null)
+        : Attribute, ITestBuilder, IApplyToTest
+    {
+```
+
+The difference being `int NumberOfParameters(IMethodInfo method);` instead of `public bool HasDataFor(IParameterInfo parameter)`.
+
+There is a provided implementation where the presence of `[Auto]` marks the cut off point where AutoFixture provides the remaining parameters.
+It is only necessary to mark if useDataFor is false.
+
+
+```
+    public class AutoParameterDataProvider(IParameterDataProvider nunitParameterDataProvider, bool useHasDataFor = true) : IAutoParameterDataProvider
+    {
+        public IEnumerable GetDataFor(IParameterInfo parameter) => nunitParameterDataProvider.GetDataFor(parameter);
+
+        public int NumberOfParameters(IMethodInfo method)
+        {
+            var parameters = method.GetParameters();
+            for(var i=0;i<parameters.Length; i++)
+            {
+                var parameter = parameters[i];
+                if (parameter.IsAutoParameter() || (useHasDataFor && !nunitParameterDataProvider.HasDataFor(parameter)))
+                {
+                    return i;
+                }
+            }
+
+            return parameters.Length;
+        }
+    }
+```
+
+
+
 **Note that with NUnit and IParameterDataSource attributes it is not necessary to apply the
 CombinatorialAttribute to the test method as it is the default. This is not true with AutoCombinatorialAttribute.**
 
-**For AutoCombiningStrategyAttribute to work you need to apply** `[Auto]` **on the first parameter to be supplied by AutoFixture.**
-
-# AutoTestCaseSourceAttribute
-
-The sources have to be IEnumerable containing IEnumerable items.
-
-It has similar constructors to TestCaseSourceAttribute with the addition of constructor parameters for
-when the test case source comes from the supplied Type that inherits IEnumerable containing IEnumerable items.
-
-# AutoTestCaseSourceAttribute / AutoCombiningStrategyAttribute common
-
-# Generic and non generic versions
-
-For AutoTestCaseSourceAttribute and "Auto" versions of CombiningStrategyAttribute and derivations there is also a generic attribute version.
-
-The generic attribute argument is `TFixtureFactory` `where TFixtureFactory : IFixtureFactory, new()`.
-
-For the non generic attribute, if you need an IFixture different to the default `new Fixture()` there are two solutions :
-
-1. Derive and supply your own Func<IFixture> to the base type.
-
-2. If you already have an InlineAutoDataAttribute ( or AutoTestCaseAttribute ) derivation then you can set the
-
-`InlineAutoDataAttributeType` property. The type has to have a single constructor `params object?[] values` and will instantiated with reflection.
-
-# Behaviour
-
-These get values from their respective sources then supply the remaining from AutoFixture.
-
-If the final parameter is a `CancellationToken` and the test method has a `CancelAfterAttribute` then the CancellationToken is supplied by NUnit.
-
-If you want AutoFixture to supply the CancellationToken then apply `[Auto]` to that parameter.
-
-This also applies to AutoTestAttribute and AutoTestCaseAttribute.
-
-Similar to the xUnit `MemberAutoDataAttribute` and `ClassAutoDataAttribute` it is possible to `[Freeze]` values from the source.
-Just apply `[Frozen]` or an attribute with interface `IFreezeTestCaseArgument` like `FrozenNamedAttribute` or `FrozenParameterIndexAttribute` to the parameter.
+**For AutoTheoryAttribute to work you need to apply** `[Auto]` **on the first parameter to be supplied by AutoFixture.**
+( as internally the NUnit DatapointProvider is used and HasDataFor only applied when used by an NUnit TheoryAttribute )

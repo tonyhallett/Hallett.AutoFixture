@@ -1856,7 +1856,7 @@ For instance members the DatapointProvider will create a single cached instance 
 
 </details>
 
-AutoFixture can have the same behaviour by using the IParameterDataProvider and ICombiningStrategy with the same inheritance hierarchy.
+AutoFixture can have the same behaviour by using an IAutoParameterDataProvider ( similar to IParameterDataProvider) and ICombiningStrategy with the same inheritance hierarchy.
 
 Note that NUnit does not require a CombiningStrategyAttribute to be applied to a test with IParameterDataSource attributed parameters, a CombinatorialAttribute will be implicitly used. This is necessary when using an AutoCombiningStrategyAttribute.
 
@@ -1887,7 +1887,44 @@ Note that NUnit does not require a CombiningStrategyAttribute to be applied to a
 </details>
 
 As there are two inheritance hierarchies, `AutoCombiningStrategyAttribute` and `AutoCombiningStrategyAttribute<TFixtureFactory>` the common code
-is in `AutoCombiningStrategyHelper`. This has similar code to NUnit CombiningStrategyAttribute with regards to the usage of IParameterDataProvider and ICombiningStrategy with the main difference being the requirement of `AutoAttribute` being applied to the first parameter that AutoFixture provides as we do not want the IParameterDataProvider to provide for these.
+is in `AutoCombiningStrategyHelper`. 
+This has similar code to NUnit CombiningStrategyAttribute with regards to the usage of IParameterDataProvider and ICombiningStrategy.
+
+The main difference is instead of using IParameterDataProvider it uses IAutoParameterDataProvider.
+
+As we do not want to ask an IParameterDataProvider for all the arguments we need to know when to stop asking.
+IParameterDataProvider does have `public bool HasDataFor(IParameterInfo parameter)` but this cannot be used as the 
+DatapointProvider is specific to the TheoryAttribute in this regard.  Therefore the IAutoParameterDataProvider has `int NumberOfParameters(IMethodInfo method);` instead.
+The AutoCombiningStrategyAttribute derivations wrap the NUnit IParameterDataProvider implementations using the class below that always looks for `[Auto]` as a cut off point.
+This is only necessary for AutoTheoryAttribute, for the ParameterDataSourceProvider HasDataFor is used.
+
+<details>
+<summary>AutoParameterDataProvider</summary>
+
+```C#
+public class AutoParameterDataProvider(IParameterDataProvider nunitParameterDataProvider, bool useHasDataFor = true) : IAutoParameterDataProvider
+{
+    public IEnumerable GetDataFor(IParameterInfo parameter) => nunitParameterDataProvider.GetDataFor(parameter);
+
+    public int NumberOfParameters(IMethodInfo method)
+    {
+        var parameters = method.GetParameters();
+        for(var i=0;i<parameters.Length; i++)
+        {
+            var parameter = parameters[i];
+            if (parameter.IsAutoParameter() || (useHasDataFor && !nunitParameterDataProvider.HasDataFor(parameter)))
+            {
+                return i;
+            }
+        }
+
+        return parameters.Length;
+    }
+}
+```
+</details>
+
+
 
 The helper argument `Func<ITestCaseData, TestMethod> testMethodFromTestCaseData` then creates the TestMethod from the combined provided data.
 `AutoCombiningStrategyAttribute` and `AutoCombiningStrategyAttribute<TFixtureFactory>` both use another helper, `TestCaseTestMethodCreator`, to do this.
@@ -1905,7 +1942,7 @@ internal class AutoCombiningStrategyHelper : IAutoCombiningStrategyHelper
         IMethodInfo method,
         Test? suite,
         ICombiningStrategy strategy,
-        IParameterDataProvider provider,
+        IAutoParameterDataProvider provider,
         Func<ITestCaseData, TestMethod> testMethodFromTestCaseData)
     {
         List<TestMethod> tests = [];
@@ -1914,13 +1951,14 @@ internal class AutoCombiningStrategyHelper : IAutoCombiningStrategyHelper
 
         if (parameters.Length > 0)
         {
-            int parametersToSupply = GetParametersToSupply(parameters);
-            IEnumerable[] sources = new IEnumerable[parametersToSupply];
+            IEnumerable[] sources = new IEnumerable[provider.NumberOfParameters(method)];
 
             try
             {
-                for (int i = 0; i < parametersToSupply; i++)
+                for (int i = 0; i < sources.Length; i++)
+                {
                     sources[i] = provider.GetDataFor(parameters[i]);
+                }
             }
             catch (InvalidDataSourceException ex)
             {
@@ -1949,20 +1987,6 @@ internal class AutoCombiningStrategyHelper : IAutoCombiningStrategyHelper
             joinType = joinType[..^8];
 
         test.Properties.Set(PropertyNames.JoinType, joinType);
-    }
-
-    private static int GetParametersToSupply(IParameterInfo[] parameters)
-    {
-        for (var i = 0; i < parameters.Length; i++)
-        {
-            var parameter = parameters[i];
-            if (parameter.GetCustomAttributes<AutoAttribute>(false).Length > 0)
-            {
-                return i;
-            }
-        }
-
-        throw new InvalidOperationException("No parameter marked with [Auto] found.");
     }
 }
 ```

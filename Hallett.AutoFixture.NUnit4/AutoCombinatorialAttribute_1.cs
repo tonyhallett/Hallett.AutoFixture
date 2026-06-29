@@ -9,7 +9,7 @@ namespace Hallett.AutoFixture.NUnit4
         where TFixtureFactory : IFixtureFactory, new()
     {
         public AutoCombinatorialAttribute()
-            : base(new CombinatorialStrategy(), new ParameterDataSourceProvider())
+            : base(new CombinatorialStrategy(), new AutoParameterDataProvider(new ParameterDataSourceProvider()))
         {
         }
     }

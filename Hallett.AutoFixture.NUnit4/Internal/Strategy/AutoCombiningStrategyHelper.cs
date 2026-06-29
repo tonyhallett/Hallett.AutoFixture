@@ -13,7 +13,7 @@ namespace Hallett.AutoFixture.NUnit4.Internal.Strategy
             IMethodInfo method,
             Test? suite,
             ICombiningStrategy strategy,
-            IParameterDataProvider provider,
+            IAutoParameterDataProvider provider,
             Func<ITestCaseData, TestMethod> testMethodFromTestCaseData)
         {
             List<TestMethod> tests = [];
@@ -22,13 +22,14 @@ namespace Hallett.AutoFixture.NUnit4.Internal.Strategy
 
             if (parameters.Length > 0)
             {
-                int parametersToSupply = GetParametersToSupply(parameters);
-                IEnumerable[] sources = new IEnumerable[parametersToSupply];
+                IEnumerable[] sources = new IEnumerable[provider.NumberOfParameters(method)];
 
                 try
                 {
-                    for (int i = 0; i < parametersToSupply; i++)
+                    for (int i = 0; i < sources.Length; i++)
+                    {
                         sources[i] = provider.GetDataFor(parameters[i]);
+                    }
                 }
                 catch (InvalidDataSourceException ex)
                 {
@@ -57,20 +58,6 @@ namespace Hallett.AutoFixture.NUnit4.Internal.Strategy
                 joinType = joinType[..^8];
 
             test.Properties.Set(PropertyNames.JoinType, joinType);
-        }
-
-        private static int GetParametersToSupply(IParameterInfo[] parameters)
-        {
-            for (var i = 0; i < parameters.Length; i++)
-            {
-                var parameter = parameters[i];
-                if (parameter.GetCustomAttributes<AutoAttribute>(false).Length > 0)
-                {
-                    return i;
-                }
-            }
-
-            throw new InvalidOperationException("No parameter marked with [Auto] found.");
         }
     }
 }

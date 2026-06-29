@@ -14,8 +14,11 @@ namespace Hallett.AutoFixture.NUnit4
         }
 
         protected AutoCombinatorialAttribute(Func<IFixture> fixtureFactory)
-            : base(new CombinatorialStrategy(), new ParameterDataSourceProvider(), fixtureFactory)
+            : base(new CombinatorialStrategy(),
+                  new AutoParameterDataProvider(new ParameterDataSourceProvider()),
+                  fixtureFactory)
         {
         }
     }
+
 }
