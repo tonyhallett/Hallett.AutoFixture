@@ -7,5 +7,5 @@
     /// to mark the first parameter that should be automatically supplied. 
     /// It is also used to mark the last parameter, when of type CancellationToken, to indicate that AutoFixture should supply it and not NUnit.
     /// </summary>
-    class AutoAttribute : Attribute { }
+    public class AutoAttribute : Attribute { }
 }
