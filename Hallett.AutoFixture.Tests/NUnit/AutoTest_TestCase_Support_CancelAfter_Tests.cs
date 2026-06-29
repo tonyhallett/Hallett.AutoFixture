@@ -17,6 +17,22 @@ namespace Hallett.AutoFixture.Tests.NUnit
             });
         }
 
+        class CustomAutoTestAttribute() : AutoTestAttribute(() => new Fixture())
+        {
+        };
+
+        [Test, CancelAfter(1000), CustomAutoTest]
+        public void AutoDataCancelAttribute_Cancels_Test_Derivation(
+            IFixture fixture,
+            CancellationToken nunitCancellationToken)
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.That(nunitCancellationToken, Is.EqualTo(TestContext.CurrentContext.CancellationToken));
+                Assert.That(fixture, Is.Not.Null);
+            });
+        }
+
         [Test, CancelAfter(1000), AutoTestCase(1)]
         public void InlineAutoDataCancelAttribute_Cancels_Test(
             int inline,

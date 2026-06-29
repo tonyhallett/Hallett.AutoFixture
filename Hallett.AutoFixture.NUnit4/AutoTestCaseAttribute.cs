@@ -12,7 +12,7 @@ namespace Hallett.AutoFixture.NUnit4
         public AutoTestCaseAttribute(params object?[] values) : base(values) 
             => TestMethodBuilder = new FixedNameTestMethodBuilderCancellationTokenAware();
 
-        internal AutoTestCaseAttribute(Func<IFixture> fixtureFactory, params object?[] arguments) : base(fixtureFactory, arguments) 
+        protected AutoTestCaseAttribute(Func<IFixture> fixtureFactory, params object?[] arguments) : base(fixtureFactory, arguments) 
             => TestMethodBuilder = new FixedNameTestMethodBuilderCancellationTokenAware();
     }
 }
