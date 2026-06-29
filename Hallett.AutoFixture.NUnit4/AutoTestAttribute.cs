@@ -11,7 +11,7 @@ namespace Hallett.AutoFixture.NUnit4
     {
         public AutoTestAttribute() => TestMethodBuilder = new FixedNameTestMethodBuilderCancellationTokenAware();
 
-        protected AutoTestAttribute(Func<IFixture> fixtureFactory) : base(fixtureFactory) 
+        protected AutoTestAttribute(Func<IFixture> fixtureFactory) : base(fixtureFactory)
             => TestMethodBuilder = new FixedNameTestMethodBuilderCancellationTokenAware();
     }
 }

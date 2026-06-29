@@ -1,5 +1,4 @@
 ﻿using AutoFixture;
-using Hallett.AutoFixture.NUnit4;
 using NUnit.Framework.Interfaces;
 using NUnit.Framework.Internal;
 

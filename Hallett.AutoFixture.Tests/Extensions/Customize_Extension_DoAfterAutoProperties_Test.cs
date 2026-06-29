@@ -1,5 +1,4 @@
 ﻿using AutoFixture;
-using Hallett.AutoFixture;
 
 namespace Hallett.AutoFixture.Tests.Extensions
 {

@@ -168,7 +168,7 @@ namespace Hallett.AutoFixture.Tests.NUnit
             Assert.That(withFrozenParameter.FrozenInt, Is.EqualTo(frozenTestCaseSourceParameter));
         }
 
-        internal static object[] EnumerableOfEnumerableCases = 
+        internal static object[] EnumerableOfEnumerableCases =
         [
             new object[] { 1 },
             new object[] { 2 }

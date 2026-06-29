@@ -1,7 +1,6 @@
 ﻿using AutoFixture;
 using AutoFixture.Kernel;
 using AutoFixture.NUnit4;
-using Hallett.AutoFixture.NUnit4;
 using NUnit.Framework.Interfaces;
 
 namespace Hallett.AutoFixture.NUnit4.Internal.TestCases

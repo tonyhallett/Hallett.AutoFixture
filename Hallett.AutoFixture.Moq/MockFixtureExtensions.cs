@@ -1,5 +1,4 @@
 ﻿using AutoFixture;
-using Hallett.AutoFixture;
 using Moq;
 
 namespace Hallett.AutoFixture.Moq
