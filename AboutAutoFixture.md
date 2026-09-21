@@ -721,6 +721,8 @@ There are also implementations for specifying how to construct the specimen for 
 
 `GreedyAttribute` => `new ConstructorCustomization(parameter.ParameterType, new GreedyConstructorQuery());`
 
+**Note that the GreedyConstructorQuery only considers public constructors.  As such I have created GreedyInternalAttribute to consider internal constructors only.**
+
 `ModestAttribute` => `new ConstructorCustomization(parameter.ParameterType, new ModestConstructorQuery());`
 
 When the ConstructorCustomization is appied, it adds the same ISpecimenBuilder as Register but with a specific IMethodQuery.

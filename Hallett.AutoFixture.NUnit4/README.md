@@ -1,5 +1,9 @@
 ﻿# Hallett.AutoFixture.NUnit4
 
+# GreedyInternalAttribute
+
+The `GreedyAttribute` only considers public constructors.  The `GreedyInternalAttribute` only considers internal constructors.
+
 # Custom frozen attributes
 
 The NUnit FrozenAttribute is reliant upon test method parameter names when `Matching.PropertyName`, `Matching.FieldName`, `Matching.ParameterName`.
