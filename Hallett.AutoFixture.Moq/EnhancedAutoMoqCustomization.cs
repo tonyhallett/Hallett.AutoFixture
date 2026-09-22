@@ -1,12 +1,12 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using AutoFixture.Kernel;
+using Hallett.AutoFixture.Moq.EnhancedCustomization.Parameters;
+using Hallett.AutoFixture.Moq.EnhancedCustomization.SpecimenBuilders;
 using Moq;
 
 namespace Hallett.AutoFixture.Moq
 {
-    public enum AutoPropertiesBehaviour { FollowFixture, Omit, Enable }
-
     /// <summary>
     /// An enhanced version of AutoMoqCustomization that allows for more control over mock configuration, including the ability to intercept mock creation and control auto-properties behavior on the created Mock.Object
     /// </summary>
@@ -18,6 +18,8 @@ namespace Hallett.AutoFixture.Moq
         public EnhancedAutoMoqCustomization() => _relay = new MockRelay();
 
         public bool ConfigureMembers { get; set; }
+
+        public bool DefaultIsStrict { get; set; } = false;
 
         public AutoPropertiesBehaviour AutoPropertiesBehaviour { get; set; } = AutoPropertiesBehaviour.FollowFixture;
 
@@ -44,18 +46,16 @@ namespace Hallett.AutoFixture.Moq
         {
             ArgumentNullException.ThrowIfNull(fixture);
 
-            ISpecimenBuilder mockBuilder = new MockPostprocessor(
-                new MethodInvoker(
-                    new MockConstructorQuery()));
+            var mockStrictBehaviorSpecimenBuilder = new MockStrictBehaviorSpecimenBuilder();
+            var mockBuilder = new Postprocessor(
+                    builder: new MockWithBehaviorCreator(DefaultIsStrict, mockStrictBehaviorSpecimenBuilder),
+                    command: GetPostProcessorCommand(fixture));
 
-            if (ConfigureMembers)
-            {
-                mockBuilder = new Postprocessor(
-                    builder: mockBuilder,
-                    command: GetConfigureMembersCommand(fixture));
-            }
-
+            fixture.Customizations.Add(mockStrictBehaviorSpecimenBuilder);
+            fixture.Customizations.Add(new MockStrictParameterRelay(DefaultIsStrict));
             fixture.Customizations.Add(mockBuilder);
+
+
             fixture.ResidueCollectors.Add(Relay);
 
             if (GenerateDelegates)
@@ -64,9 +64,9 @@ namespace Hallett.AutoFixture.Moq
             }
         }
 
-        private CompositeSpecimenCommand GetConfigureMembersCommand(IFixture fixture)
+        private ISpecimenCommand GetPostProcessorCommand(IFixture fixture)
         {
-            var setupMockCommand = new ActionSpecimenCommand<Mock>(mock =>
+            var interceptMockCommand = new ActionSpecimenCommand<Mock>(mock =>
             {
                 var mockedType = GetGenericArgumentType(mock.GetType());
                 if (interceptors.TryGetValue(mockedType, out var interceptor))
@@ -75,21 +75,26 @@ namespace Hallett.AutoFixture.Moq
                 }
             });
 
-            if (ShouldAutoMockProperties(fixture))
+            if (ConfigureMembers)
             {
+                if (ShouldAutoMockProperties(fixture))
+                {
+                    return new CompositeSpecimenCommand(
+                            new StubPropertiesCommand(),
+                            new MockVirtualMethodsCommand(),
+                            new AutoMockPropertiesCommand(),
+                            interceptMockCommand
+                            );
+                }
+
                 return new CompositeSpecimenCommand(
-                        new StubPropertiesCommand(),
-                        new MockVirtualMethodsCommand(),
-                        new AutoMockPropertiesCommand(),
-                        setupMockCommand
-                        );
+                    new StubPropertiesCommand(),
+                    new MockVirtualMethodsCommand(),
+                    interceptMockCommand
+                    );
             }
 
-            return new CompositeSpecimenCommand(
-                new StubPropertiesCommand(),
-                new MockVirtualMethodsCommand(),
-                setupMockCommand
-                );
+            return interceptMockCommand;
         }
 
         private bool ShouldAutoMockProperties(IFixture fixture) => AutoPropertiesBehaviour == AutoPropertiesBehaviour.FollowFixture ?
